@@ -1,6 +1,27 @@
+"use client";
+
 import Image from "next/image";
+import Honeybadger from "@honeybadger-io/js";
 
 export default function Home() {
+  const triggerClientError = () => {
+    try {
+      throw new Error("This is a test client-side error for Honeybadger");
+    } catch (error) {
+      Honeybadger.notify(error as Error);
+    }
+  };
+
+  const triggerServerError = async () => {
+    try {
+      const response = await fetch("/api/test-error");
+      if (!response.ok) {
+        throw new Error("Server error test failed");
+      }
+    } catch (error) {
+      console.error("Error calling server:", error);
+    }
+  };
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
@@ -24,6 +45,21 @@ export default function Home() {
             Save and see your changes instantly.
           </li>
         </ol>
+
+        <div className="flex gap-4 items-center flex-col sm:flex-row">
+          <button
+            onClick={triggerClientError}
+            className="rounded-full border border-solid border-red-500 bg-red-500 text-white transition-colors flex items-center justify-center hover:bg-red-600 font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
+          >
+            Test Client Error
+          </button>
+          <button
+            onClick={triggerServerError}
+            className="rounded-full border border-solid border-orange-500 bg-orange-500 text-white transition-colors flex items-center justify-center hover:bg-orange-600 font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
+          >
+            Test Server Error
+          </button>
+        </div>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
           <a
